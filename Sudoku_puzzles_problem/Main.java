@@ -2,7 +2,6 @@
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.json.JSONObject;
 
 class Main {
 
@@ -283,16 +282,6 @@ class Main {
                 }
             }
             return true;
-        }
-    }
-
-    public class TrackDisplayApp {
-
-        public Object titleLabel;
-
-        public Object updateTrackInfo(JSONObject obj) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'updateTrackInfo'");
         }
     }
 }
