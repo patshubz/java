@@ -1,0 +1,51 @@
+# Problem: Sudoku Generation and Solution Game
+
+Create a full implementation of a Sudoku generation and solution game using Java that supports variable board sizes: 4x4, 9x9, and 16x16.
+
+## System Specifications:
+
+- Multi-size Sudoku support (4x4, 9x9, 16x16 grids)
+- Puzzle generation with configurable difficulty (number of clues)
+- Backtracking algorithm for solving puzzles
+- Board validation and constraint checking
+- Thread-safe operations for concurrent access
+- Efficient memory usage and performance optimization
+
+## Required Methods:
+
+- Sudoku(int size) - Constructor that initializes board of specified size
+- generatePuzzle(int clues) - Generate solvable puzzle with given number of clues
+- solve() - Solve the current puzzle using backtracking algorithm
+- printBoard() - Display current board state (empty cells as dots)
+- getBoardCopy() - Return deep copy of current board state
+- setBoard(int[][] board) - Set board to specific configuration
+- isValidPlacement(int row, int col, int num) - Check if number placement is valid
+
+## Constraints:
+
+- Board size must be perfect square (4, 9, 16)
+- Use only Java standard library (no external dependencies)
+- Handle invalid inputs with appropriate exceptions
+- Efficient backtracking with pruning for performance
+- Memory-efficient board representation
+- Support for empty board initialization
+
+## Performance Requirements:
+
+- 4x4 puzzles: solve in under 1ms
+- 9x9 puzzles: solve in under 100ms  
+- 16x16 puzzles: solve in under 5 seconds
+- Generate puzzles with unique solutions
+- Memory usage under 1MB for largest boards
+
+## Example Usage:
+
+Sudoku sudoku = new Sudoku(9);
+sudoku.generatePuzzle(32); // Generate 9x9 with 32 clues
+sudoku.printBoard(); // Display puzzle
+boolean solved = sudoku.solve(); // Solve puzzle
+sudoku.printBoard(); // Display solution
+
+
+Implement all methods to ensure optimal performance and correctness for all supported board sizes.
+

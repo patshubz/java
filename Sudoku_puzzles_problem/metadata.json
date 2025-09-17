@@ -1,0 +1,15 @@
+{
+    "programming_language": ["Java"],
+    "solution_file_path": ["Main.java"],
+    "test_file_path": ["Test.java"],
+    "execution_file_path": "run.sh",
+    "programming_language_version": "Java 8+",
+    "task_type": "code_generation",
+    "subject_labels": ["Game Development", "Algorithms", "Puzzle Generation", "Java Programming"],
+    "dependencies": {
+        "test_dependencies": [
+            "java.util: standard lib - Java 8+",
+            "java.util.concurrent: standard lib - Java 8+"
+        ]
+    }
+}
