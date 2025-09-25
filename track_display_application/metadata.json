@@ -1,0 +1,100 @@
+{
+  "problem_statement": {
+    "background": "The application is a classic reactive GUI: it must connect to a local socket, process streamed JSON, and update a vertically centered, responsive display immediately on each new event, with different visual indication depending on \"playing\" status.",
+    "adherence": "adheres",
+    "subject_labels": [
+      "GUI Programming",
+      "Java Swing", 
+      "Network Sockets",
+      "JSON Parsing",
+      "Thread Safety",
+      "Event-Driven Programming"
+    ],
+    "programming_language_version": "Java 8+",
+    "programming_language": ["java"],
+    "task_type": "code_generation",
+    "complexity_rating": "High",
+    "estimated_time_minutes": 45
+  },
+  "technical_requirements": {
+    "core_functionality": [
+      "Socket connection to localhost:532",
+      "JSON data parsing without external libraries", 
+      "Real-time GUI updates",
+      "Vertical layout with proper centering",
+      "Image display with scaling",
+      "Text styling based on playing status"
+    ],
+    "architectural_patterns": [
+      "Event-driven programming",
+      "Producer-consumer pattern", 
+      "Observer pattern for GUI updates",
+      "Thread-safe operations"
+    ],
+    "non_functional_requirements": [
+      "Responsive design",
+      "Error handling and recovery",
+      "Headless mode support",
+      "Memory efficiency",
+      "CPU optimization"
+    ]
+  },
+  "implementation_details": {
+    "main_classes": [
+      "Main - Entry point and application container",
+      "TrackDisplayApplication - Main GUI class extending JFrame",
+      "SimpleJSONParser - Custom JSON parsing utility"
+    ],
+    "key_methods": [
+      "initializeUserInterface() - GUI setup",
+      "startSocketConnectionListener() - Socket handling", 
+      "updateTrackDisplayInformation() - GUI updates",
+      "parseJSON() - JSON processing"
+    ],
+    "gui_components": [
+      "JLabel for image display",
+      "JLabel for title (larger font)",
+      "JLabel for artist", 
+      "JLabel for length",
+      "JPanel with BoxLayout for vertical stacking"
+    ]
+  },
+  "test_requirements": {
+    "test_categories": [
+      "JSON parsing functionality",
+      "GUI component updates",
+      "Error handling scenarios",
+      "Thread safety validation",
+      "Headless mode operation"
+    ],
+    "test_coverage_target": "85%",
+    "test_framework": "Custom lightweight testing (no external dependencies)"
+  },
+  "quality_standards": {
+    "code_style": [
+      "Descriptive variable names",
+      "Proper exception handling", 
+      "Clean method organization",
+      "Appropriate comments",
+      "Standard Java conventions"
+    ],
+    "performance": [
+      "Efficient JSON parsing",
+      "Minimal GUI thread blocking",
+      "Resource cleanup",
+      "Memory leak prevention"
+    ]
+  },
+  "deployment_considerations": {
+    "environment_support": [
+      "Desktop GUI environment",
+      "Headless server environment", 
+      "Cross-platform compatibility"
+    ],
+    "build_requirements": [
+      "Standard Java compilation",
+      "No external dependencies",
+      "Simple shell script execution"
+    ]
+  }
+}

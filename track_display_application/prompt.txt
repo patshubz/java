@@ -1,0 +1,28 @@
+Create code in Java for a Swing application that reads in track data from a localhost socket at port 532.
+
+The data from the socket is JSON data with the following structure:
+```json
+{
+    "title": "string",
+    "artist": "string", 
+    "length": "string",
+    "image_path": "string",
+    "playing?": "boolean"
+}
+```
+
+The application reads in this data and displays the current playing "song". Specifically, the layout should be such that the image is displayed first, then the title (in a bigger font size than the artist), then the artist, and then the length.
+
+That is, the layout is just a vertical stack of components, and they must be vertically and horizontally centered (make sure program is responsive when resizing occurs).
+
+Note that socket server will output track data at random times, so make sure that new track data causes the display to update instantly.
+
+To denote playing vs not playing status, have the title, artist and length text be glowing when playing, vs normal when not playing.
+
+Requirements:
+- Use only standard Java libraries (no external JSON libraries)
+- Implement proper error handling for socket connections
+- Ensure thread safety for GUI updates
+- Make the application responsive and centered
+- Include comprehensive test cases
+- Support headless mode for testing environments
