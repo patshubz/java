@@ -11,6 +11,7 @@ import java.util.Map;
 public class Main {
     
     public static class SimpleJSONParser {
+        
         public static Map<String, Object> parseJSON(String jsonString) {
             Map<String, Object> result = new HashMap<>();
             if (jsonString == null || jsonString.trim().isEmpty()) {
@@ -37,7 +38,7 @@ public class Main {
                         } else if (value.startsWith("\"") && value.endsWith("\"")) {
                             result.put(key, value.substring(1, value.length() - 1));
                         } else {
-                            result.put(key, value.replaceAll("\"", ""));
+                            result.put(key, value);
                         }
                     }
                 }
@@ -48,13 +49,13 @@ public class Main {
             return result;
         }
         
-        public static String getString(Map<String, Object> json, String key, String defaultValue) {
-            Object value = json.get(key);
+        public static String getString(Map<String, Object> data, String key, String defaultValue) {
+            Object value = data.get(key);
             return value != null ? value.toString() : defaultValue;
         }
         
-        public static boolean getBoolean(Map<String, Object> json, String key, boolean defaultValue) {
-            Object value = json.get(key);
+        public static boolean getBoolean(Map<String, Object> data, String key, boolean defaultValue) {
+            Object value = data.get(key);
             if (value instanceof Boolean) {
                 return (Boolean) value;
             }
@@ -63,112 +64,113 @@ public class Main {
     }
     
     public static class TrackDisplayApplication extends JFrame {
-        public JLabel imageLabel;
-        public JLabel titleLabel;
-        public JLabel artistLabel;
-        public JLabel lengthLabel;
-        private JPanel mainPanel;
+        private JLabel imageDisplayLabel;
+        private JLabel trackTitleLabel;
+        private JLabel artistNameLabel;
+        private JLabel songLengthLabel;
+        private JPanel mainContentPanel;
         private ExecutorService socketExecutor;
-        private volatile boolean isRunning = true;
-
+        private volatile boolean isSocketListenerRunning = false;
+        private boolean enableSocketConnection;
+        
         public TrackDisplayApplication() {
             this(true);
         }
         
         public TrackDisplayApplication(boolean enableSocket) {
-            // Check if running in headless mode
-            if (GraphicsEnvironment.isHeadless()) {
-                System.out.println("Running in headless mode - GUI components disabled");
-                return;
-            }
-            
+            this.enableSocketConnection = enableSocket;
             initializeUserInterface();
             if (enableSocket) {
                 startSocketConnectionListener();
             }
         }
-
+        
         private void initializeUserInterface() {
             setTitle("Track Display Application");
-            setSize(450, 650);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setLocationRelativeTo(null);
-
-            mainPanel = new JPanel();
-            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-            mainPanel.setBorder(new EmptyBorder(30, 30, 30, 30));
-            mainPanel.setBackground(Color.BLACK);
-
-            mainPanel.add(Box.createVerticalGlue());
-
-            imageLabel = new JLabel();
-            imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            imageLabel.setPreferredSize(new Dimension(250, 250));
-            mainPanel.add(imageLabel);
-
-            mainPanel.add(Box.createRigidArea(new Dimension(0, 25)));
-
-            titleLabel = new JLabel();
-            titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
-            titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            titleLabel.setForeground(Color.WHITE);
-            mainPanel.add(titleLabel);
-
-            mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-
-            artistLabel = new JLabel();
-            artistLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            artistLabel.setFont(new Font("Arial", Font.PLAIN, 24));
-            artistLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            artistLabel.setForeground(Color.WHITE);
-            mainPanel.add(artistLabel);
-
-            mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-
-            lengthLabel = new JLabel();
-            lengthLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            lengthLabel.setFont(new Font("Monospaced", Font.PLAIN, 20));
-            lengthLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            lengthLabel.setForeground(Color.WHITE);
-            mainPanel.add(lengthLabel);
-
-            mainPanel.add(Box.createVerticalGlue());
-
+            setSize(500, 700);
+            
+            mainContentPanel = new JPanel();
+            mainContentPanel.setLayout(new BoxLayout(mainContentPanel, BoxLayout.Y_AXIS));
+            mainContentPanel.setBorder(new EmptyBorder(30, 30, 30, 30));
+            mainContentPanel.setBackground(Color.BLACK);
+            
+            // Add vertical glue for centering
+            mainContentPanel.add(Box.createVerticalGlue());
+            
+            // Image display
+            imageDisplayLabel = new JLabel();
+            imageDisplayLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            imageDisplayLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            mainContentPanel.add(imageDisplayLabel);
+            mainContentPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+            
+            // Track title
+            trackTitleLabel = new JLabel();
+            trackTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            trackTitleLabel.setFont(new Font("SansSerif", Font.BOLD, 32));
+            trackTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            trackTitleLabel.setForeground(Color.WHITE);
+            mainContentPanel.add(trackTitleLabel);
+            mainContentPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+            
+            // Artist name
+            artistNameLabel = new JLabel();
+            artistNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            artistNameLabel.setFont(new Font("SansSerif", Font.PLAIN, 24));
+            artistNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            artistNameLabel.setForeground(Color.WHITE);
+            mainContentPanel.add(artistNameLabel);
+            mainContentPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+            
+            // Song length
+            songLengthLabel = new JLabel();
+            songLengthLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            songLengthLabel.setFont(new Font("Monospaced", Font.PLAIN, 20));
+            songLengthLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            songLengthLabel.setForeground(Color.WHITE);
+            mainContentPanel.add(songLengthLabel);
+            
+            // Add vertical glue for centering
+            mainContentPanel.add(Box.createVerticalGlue());
+            
             setLayout(new GridBagLayout());
-            GridBagConstraints constraints = new GridBagConstraints();
-            constraints.fill = GridBagConstraints.BOTH;
-            constraints.weightx = 1.0;
-            constraints.weighty = 1.0;
-            add(mainPanel, constraints);
-
-            getContentPane().setBackground(Color.BLACK);
+            add(mainContentPanel, new GridBagConstraints());
+            
+            setLocationRelativeTo(null);
         }
-
+        
         private void startSocketConnectionListener() {
+            if (!enableSocketConnection) return;
+            
             socketExecutor = Executors.newSingleThreadExecutor();
+            isSocketListenerRunning = true;
+            
             socketExecutor.execute(() -> {
-                while (isRunning) {
+                while (isSocketListenerRunning) {
                     try (Socket clientSocket = new Socket("localhost", 532);
-                         BufferedReader socketReader = new BufferedReader(
-                             new InputStreamReader(clientSocket.getInputStream()))) {
+                         BufferedReader socketReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
                         
-                        String jsonDataLine;
-                        while ((jsonDataLine = socketReader.readLine()) != null && isRunning) {
+                        System.out.println("Successfully connected to server on port 532");
+                        String receivedLine;
+                        
+                        while (isSocketListenerRunning && (receivedLine = socketReader.readLine()) != null) {
                             try {
-                                Map<String, Object> trackJsonData = SimpleJSONParser.parseJSON(jsonDataLine);
-                                updateTrackDisplayInformation(trackJsonData);
-                            } catch (Exception jsonParsingException) {
-                                System.err.println("JSON parsing error: " + jsonDataLine);
+                                Map<String, Object> trackData = SimpleJSONParser.parseJSON(receivedLine);
+                                updateTrackDisplayInformation(trackData);
+                            } catch (Exception jsonException) {
+                                System.err.println("Failed to parse JSON data: " + receivedLine);
+                                jsonException.printStackTrace();
                             }
                         }
                     } catch (IOException connectionException) {
-                        if (isRunning) {
-                            System.err.println("Socket connection error: " + connectionException.getMessage());
+                        if (isSocketListenerRunning) {
+                            System.err.println("Connection error: " + connectionException.getMessage());
+                            
+                            // Auto-reconnect attempt
                             try {
                                 Thread.sleep(3000);
-                            } catch (InterruptedException e) {
+                            } catch (InterruptedException interruptedException) {
                                 Thread.currentThread().interrupt();
                                 break;
                             }
@@ -177,127 +179,120 @@ public class Main {
                 }
             });
         }
-
-        public void updateTrackDisplayInformation(Map<String, Object> trackData) {
-            // Skip GUI updates in headless mode
-            if (GraphicsEnvironment.isHeadless()) {
-                System.out.println("Track update (headless): " + trackData);
-                return;
-            }
-            
+        
+        public void updateTrackDisplayInformation(Map<String, Object> trackInformation) {
             SwingUtilities.invokeLater(() -> {
                 try {
-                    String songTitle = SimpleJSONParser.getString(trackData, "title", "Unknown Title");
-                    String artistName = SimpleJSONParser.getString(trackData, "artist", "Unknown Artist");
-                    String songLength = SimpleJSONParser.getString(trackData, "length", "0:00");
-                    String imageFilePath = SimpleJSONParser.getString(trackData, "image_path", "");
-                    boolean isCurrentlyPlaying = SimpleJSONParser.getBoolean(trackData, "playing?", false);
-
-                    updateImageDisplay(imageFilePath);
-
-                    if (isCurrentlyPlaying) {
-                        applyGlowingTextEffect(songTitle, artistName, songLength);
-                    } else {
-                        applyNormalTextEffect(songTitle, artistName, songLength);
-                    }
-
-                    if (mainPanel != null) {
-                        mainPanel.revalidate();
-                        mainPanel.repaint();
-                    }
-                } catch (Exception uiUpdateException) {
-                    System.err.println("UI update error: " + uiUpdateException.getMessage());
+                    String songTitle = SimpleJSONParser.getString(trackInformation, "title", "");
+                    String artistName = SimpleJSONParser.getString(trackInformation, "artist", "");
+                    String trackLength = SimpleJSONParser.getString(trackInformation, "length", "");
+                    String imagePath = SimpleJSONParser.getString(trackInformation, "image_path", "");
+                    boolean isCurrentlyPlaying = SimpleJSONParser.getBoolean(trackInformation, "playing?", false);
+                    
+                    updateImageDisplay(imagePath);
+                    updateTextDisplayElements(songTitle, artistName, trackLength, isCurrentlyPlaying);
+                    
+                    mainContentPanel.revalidate();
+                    mainContentPanel.repaint();
+                } catch (Exception updateException) {
+                    System.err.println("Error updating display: " + updateException.getMessage());
+                    updateException.printStackTrace();
                 }
             });
         }
-
+        
         private void updateImageDisplay(String imageFilePath) {
-            if (imageLabel == null) return;
-            
+            ImageIcon displayIcon = null;
             if (imageFilePath != null && !imageFilePath.trim().isEmpty()) {
                 try {
-                    ImageIcon originalImageIcon = new ImageIcon(imageFilePath);
-                    if (originalImageIcon.getIconWidth() > 0 && originalImageIcon.getIconHeight() > 0) {
-                        int targetSize = 250;
-                        Image scaledImage = originalImageIcon.getImage().getScaledInstance(
-                            targetSize, targetSize, Image.SCALE_SMOOTH);
-                        imageLabel.setIcon(new ImageIcon(scaledImage));
-                        imageLabel.setText("");
-                    } else {
-                        setDefaultImagePlaceholder();
+                    ImageIcon originalIcon = new ImageIcon(imageFilePath);
+                    if (originalIcon.getIconWidth() > 0 && originalIcon.getIconHeight() > 0) {
+                        int imageSize = 250;
+                        Image scaledImage = originalIcon.getImage().getScaledInstance(imageSize, imageSize, Image.SCALE_SMOOTH);
+                        displayIcon = new ImageIcon(scaledImage);
                     }
-                } catch (Exception imageLoadException) {
-                    setDefaultImagePlaceholder();
+                } catch (Exception imageException) {
+                    System.err.println("Failed to load image: " + imageFilePath);
                 }
+            }
+            imageDisplayLabel.setIcon(displayIcon);
+        }
+        
+        private void updateTextDisplayElements(String title, String artist, String length, boolean isPlaying) {
+            if (isPlaying) {
+                String glowingStyle = "color: #00FFFF; text-shadow: 0 0 15px #00FFFF, 0 0 10px #8FFFFF;";
+                trackTitleLabel.setText(String.format(
+                    "<html><div style='text-align:center;%s font-size:32pt;'>%s</div></html>", 
+                    glowingStyle, escapeHtmlCharacters(title)
+                ));
+                artistNameLabel.setText(String.format(
+                    "<html><div style='text-align:center;%s font-size:24pt;'>%s</div></html>", 
+                    glowingStyle, escapeHtmlCharacters(artist)
+                ));
+                songLengthLabel.setText(String.format(
+                    "<html><div style='text-align:center;%s font-size:20pt;'>%s</div></html>", 
+                    glowingStyle, escapeHtmlCharacters(length)
+                ));
             } else {
-                setDefaultImagePlaceholder();
+                String normalStyle = "color: #CCCCCC;";
+                trackTitleLabel.setText(String.format(
+                    "<html><div style='text-align:center;%s font-size:32pt;'>%s</div></html>", 
+                    normalStyle, escapeHtmlCharacters(title)
+                ));
+                artistNameLabel.setText(String.format(
+                    "<html><div style='text-align:center;%s font-size:24pt;'>%s</div></html>", 
+                    normalStyle, escapeHtmlCharacters(artist)
+                ));
+                songLengthLabel.setText(String.format(
+                    "<html><div style='text-align:center;%s font-size:20pt;'>%s</div></html>", 
+                    normalStyle, escapeHtmlCharacters(length)
+                ));
             }
         }
-
-        private void setDefaultImagePlaceholder() {
-            if (imageLabel == null) return;
-            
-            imageLabel.setIcon(null);
-            imageLabel.setText("♪ No Image ♪");
-            imageLabel.setFont(new Font("Arial", Font.ITALIC, 18));
-            imageLabel.setForeground(Color.GRAY);
+        
+        private static String escapeHtmlCharacters(String inputText) {
+            if (inputText == null) return "";
+            return inputText.replace("&", "&amp;")
+                           .replace("<", "&lt;")
+                           .replace(">", "&gt;")
+                           .replace("\"", "&quot;")
+                           .replace("'", "&#39;");
         }
-
-        private void applyGlowingTextEffect(String title, String artist, String length) {
-            if (titleLabel != null) {
-                titleLabel.setText(title);
-                titleLabel.setForeground(Color.CYAN);
-            }
-            if (artistLabel != null) {
-                artistLabel.setText(artist);
-                artistLabel.setForeground(Color.CYAN);
-            }
-            if (lengthLabel != null) {
-                lengthLabel.setText(length);
-                lengthLabel.setForeground(Color.CYAN);
+        
+        public void stopSocketConnectionListener() {
+            isSocketListenerRunning = false;
+            if (socketExecutor != null) {
+                socketExecutor.shutdownNow();
             }
         }
-
-        private void applyNormalTextEffect(String title, String artist, String length) {
-            if (titleLabel != null) {
-                titleLabel.setText(title);
-                titleLabel.setForeground(Color.WHITE);
-            }
-            if (artistLabel != null) {
-                artistLabel.setText(artist);
-                artistLabel.setForeground(Color.WHITE);
-            }
-            if (lengthLabel != null) {
-                lengthLabel.setText(length);
-                lengthLabel.setForeground(Color.WHITE);
-            }
+        
+        public boolean isSocketListenerActive() {
+            return isSocketListenerRunning;
         }
-
-        public void stopApplication() {
-            isRunning = false;
-            if (socketExecutor != null && !socketExecutor.isShutdown()) {
-                socketExecutor.shutdown();
-            }
-        }
-
-        @Override
-        public void dispose() {
-            stopApplication();
-            if (!GraphicsEnvironment.isHeadless()) {
-                super.dispose();
-            }
-        }
+        
+        // For testing purposes
+        public JLabel getImageDisplayLabel() { return imageDisplayLabel; }
+        public JLabel getTrackTitleLabel() { return trackTitleLabel; }
+        public JLabel getArtistNameLabel() { return artistNameLabel; }
+        public JLabel getSongLengthLabel() { return songLengthLabel; }
     }
-
+    
     public static void main(String[] args) {
-        // Only start GUI if not in headless mode
-        if (!GraphicsEnvironment.isHeadless()) {
-            SwingUtilities.invokeLater(() -> {
-                TrackDisplayApplication application = new TrackDisplayApplication();
-                application.setVisible(true);
-            });
-        } else {
-            System.out.println("Running in headless mode - use Test class for validation");
+        // Support headless mode for testing
+        if (GraphicsEnvironment.isHeadless()) {
+            System.out.println("Running in headless mode - GUI disabled");
+            return;
         }
+        
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            } catch (Exception e) {
+                System.err.println("Could not set system look and feel: " + e.getMessage());
+            }
+            
+            TrackDisplayApplication application = new TrackDisplayApplication();
+            application.setVisible(true);
+        });
     }
 }
